@@ -60,3 +60,40 @@ String getContentType(String filename)
     return "text/plain";
   return "";
 }
+
+const char *jsonURL = "http://api.ipify.org/?format=json";
+// https://github.com/bblanchon/ArduinoJson/tree/7.x/examples
+void getJsonAPI()
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    WiFiClient client;
+    HTTPClient http;
+    String payload = "";
+
+    http.begin(client, jsonURL);
+    int httpResponseCode = http.GET();
+
+    if (httpResponseCode > 0)
+    {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      payload = http.getString();
+      Serial.print("the server provided this JSON : ");
+      Serial.println(payload);
+
+      JsonDocument doc;
+      deserializeJson(doc, payload);
+      Serial.println(doc["ip"].as<const char *>());
+      // Serial.println(doc["time"].as<long>());
+      // Serial.println(doc["data"][0].as<float>(), 6);
+      // Serial.println(doc["data"][1].as<float>(), 6);
+    }
+    else
+    {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+    }
+    http.end();
+  }
+}

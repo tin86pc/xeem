@@ -1,9 +1,12 @@
 // https://tttapa.github.io/ESP8266/Chap14%20-%20WebSocket.html
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h> // nạp chương trình qua wifi
 #include <WebSocketsServer.h>
+
+#include <ArduinoJson.h>
 
 ESP8266WebServer sv(80);
 ESP8266HTTPUpdateServer u;      // nạp chương trình qua wifi
@@ -14,10 +17,15 @@ WebSocketsServer webSocket(81); // create a websocket server on port 81
 #include "vl.h"
 #include "sk.h"
 
+void chay()
+{
+  Serial.println("test");
+}
+
 void startWifi()
 {
 
-  String tenWifiPhat = "TP-LINK";
+  String tenWifiPhat = "XEEM";
   String passWifiPhat = "12345678";
 
   String tenWifiBat = "Tuyen T1";
@@ -69,16 +77,16 @@ void startServer()
   sv.on("/s", []()
         { sv.send(200, "text/html", getFile("setting.html")); });
 
-  sv.on("/x", []()
-        {
-          fomatAll();
-          sv.send(200,"text/html","Format ok."); });
-
   sv.on("/r", []()
         {
           startWifi();
           //  ESP.restart();
         });
+
+  sv.on("/x", []()
+        {
+          fomatAll();
+          sv.send(200,"text/html","Format ok."); });
 
   sv.on("/w", []()
         { 
@@ -148,6 +156,8 @@ void startServer()
         }
       });
 
+  sv.on("/test", chay);
+
   sv.onNotFound([]()
                 {
                   String uri = sv.uri();
@@ -185,6 +195,8 @@ void setup()
   startServer();
   startWebSocket();
   startServo();
+
+  getJsonAPI();
 }
 
 void loop()
