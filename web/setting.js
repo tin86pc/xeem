@@ -4,38 +4,50 @@ import { send, skSocket } from "./5sk.js";
 
 tinh();
 
-fetch("/caidat.txt")
-  .then((response) => response.text())
-  .then((text) => {
-    console.log(text);
-    const ar = text.split("|");
+let caidat = {
+  tf: "0",
+  pf: "0",
+  tb: "0",
+  pb: "0",
+  ipf: "0",
+  ipb: "0",
+  ip: "0",
+  p: "0",
+};
 
-    set(a[0], ar[0]);
-    set(a[1], ar[1]);
-    set(a[2], ar[2]);
-    set(a[3], ar[3]);
+async function layDuLieu() {
+  const response = await fetch("/caidat.json");
+  const obj = await response.json();
+  caidat = Object.assign(obj);
 
-    document.getElementById("ipb").text += ar[4];
+  Object.keys(caidat).forEach(function (key) {
+    // console.log(key, caidat[key]);
+    set(key, caidat[key]);
   });
+}
 
-const a = ["tf", "pf", "tb", "pb", "ipf", "ipb"];
+layDuLieu();
 
 function get(id) {
-  return document.getElementById(id).value;
+  if (document.getElementById(id)) {
+    return document.getElementById(id).value;
+  }
 }
 
 function set(id, v) {
-  document.getElementById(id).value = v;
+  if (document.getElementById(id)) {
+    document.getElementById(id).value = v;
+  }
 }
 
 document.getElementById("ok").addEventListener("click", (e) => {
-  const nd =
-    get("tf") + "|" + get("pf") + "|" + get("tb") + "|" + get("pb") + "|";
-  console.log(nd);
+  Object.keys(caidat).forEach(function (key) {
+    caidat[key] = get(key);
+  });
 
-  const blob = new Blob([nd], { type: "text/plain" });
+  const blob = new Blob([JSON.stringify(caidat)], { type: "application/json" });
   let formData = new FormData();
-  formData.append("file", blob, "caidat.txt");
+  formData.append("file", blob, "caidat.json");
 
   fetch("/u", {
     method: "POST",

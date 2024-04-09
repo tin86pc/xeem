@@ -50,10 +50,10 @@ String getContentType(String filename)
     return "text/css";
   else if (filename.endsWith(".js"))
     return "application/javascript";
+  else if (filename.endsWith(".json"))
+    return "application/json";
   else if (filename.endsWith(".ico"))
     return "image/x-icon";
-  else if (filename.endsWith(".gz"))
-    return "application/x-gzip";
   else if (filename.endsWith(".svg"))
     return "image/svg+xml";
   else if (filename.endsWith(".txt"))
@@ -61,8 +61,10 @@ String getContentType(String filename)
   return "";
 }
 
+#include <ArduinoJson.h>
 const char *jsonURL = "http://api.ipify.org/?format=json";
 // https://github.com/bblanchon/ArduinoJson/tree/7.x/examples
+
 void getJsonAPI()
 {
   if (WiFi.status() == WL_CONNECTED)
@@ -84,7 +86,8 @@ void getJsonAPI()
 
       JsonDocument doc;
       deserializeJson(doc, payload);
-      Serial.println(doc["ip"].as<const char *>());
+      String ip = doc["ip"].as<const char *>();
+      Serial.println(ip);
       // Serial.println(doc["time"].as<long>());
       // Serial.println(doc["data"][0].as<float>(), 6);
       // Serial.println(doc["data"][1].as<float>(), 6);
