@@ -5,13 +5,14 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h> // nạp chương trình qua wifi
 #include <WebSocketsServer.h>
+#include <ArduinoJson.h>
 
 ESP8266WebServer sv(80);
 ESP8266HTTPUpdateServer u;      // nạp chương trình qua wifi
 WebSocketsServer webSocket(81); // create a websocket server on port 81
 
-#include "ham.h"
 #include "data.h"
+#include "ham.h"
 #include "vl.h"
 #include "sk.h"
 
@@ -19,6 +20,17 @@ void chay()
 {
   Serial.println("test");
 }
+
+//   let caidat = {
+//   tf: "0",
+//   pf: "0",
+//   tb: "0",
+//   pb: "0",
+//   ipf: "0",
+//   ipb: "0",
+//   ip: "0",
+//   p: "0",
+// };
 
 void startWifi()
 {
@@ -29,20 +41,34 @@ void startWifi()
   String tenWifiBat = "Tuyen T1";
   String passWifiBat = "0978333563";
 
-  String s = getFile("caidat.txt");
-
-  tenWifiPhat = tachChuoi(s, '|', 0);
-  passWifiPhat = tachChuoi(s, '|', 1);
-
-  tenWifiBat = tachChuoi(s, '|', 2);
-  passWifiBat = tachChuoi(s, '|', 3);
+  String s = getFile("caidat.json");
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, s);
+  if (error)
+  {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  tenWifiPhat = String(doc["tf"]);
+  passWifiPhat = String(doc["pf"]);
+  tenWifiBat = String(doc["tb"]);
+  passWifiBat = String(doc["pb"]);
 
   WiFi.softAPdisconnect();
   WiFi.disconnect();
 
   WiFi.mode(WIFI_AP_STA);
 
-  WiFi.softAP(tenWifiPhat);
+  if (passWifiPhat.length() >= 8)
+  {
+    WiFi.softAP(tenWifiPhat, passWifiPhat);
+  }
+  else
+  {
+    WiFi.softAP(tenWifiPhat);
+  }
+
   WiFi.begin(tenWifiBat, passWifiBat);
 
   // nếu lỗi kết nối chỉ phát chế độ AP
@@ -53,7 +79,15 @@ void startWifi()
     WiFi.mode(WIFI_AP);
     delay(100);
 
-    WiFi.softAP(tenWifiPhat);
+    if (passWifiPhat.length() >= 8)
+    {
+      WiFi.softAP(tenWifiPhat, passWifiPhat);
+    }
+    else
+    {
+      WiFi.softAP(tenWifiPhat);
+    }
+
     Serial.println(WiFi.softAPIP());
   }
   else

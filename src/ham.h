@@ -22,24 +22,24 @@ void nhay(unsigned long interval, ConTroHam func)
 //   webSocket.broadcastTXT("."); // send data to all connected clients
 // }
 
-String tachChuoi(String ss, char kt, int vt)
-{
-  int v = 0;
-  int s = 0;
-  for (unsigned int i = 0; i <= ss.length(); i++)
-  {
-    if (ss[i] == kt)
-    {
-      if (v == vt)
-      {
-        return ss.substring(s, i);
-      }
-      s = i + 1;
-      v++;
-    }
-  }
-  return "";
-}
+// String tachChuoi(String ss, char kt, int vt)
+// {
+//   int v = 0;
+//   int s = 0;
+//   for (unsigned int i = 0; i <= ss.length(); i++)
+//   {
+//     if (ss[i] == kt)
+//     {
+//       if (v == vt)
+//       {
+//         return ss.substring(s, i);
+//       }
+//       s = i + 1;
+//       v++;
+//     }
+//   }
+//   return "";
+// }
 
 // https://gist.github.com/AshHeskes/6038140
 String getContentType(String filename)
@@ -61,7 +61,6 @@ String getContentType(String filename)
   return "";
 }
 
-#include <ArduinoJson.h>
 const char *jsonURL = "http://api.ipify.org/?format=json";
 // https://github.com/bblanchon/ArduinoJson/tree/7.x/examples
 
@@ -86,12 +85,27 @@ void getJsonAPI()
 
       JsonDocument doc;
       deserializeJson(doc, payload);
-      String ip = doc["ip"].as<const char *>();
+
+      String ip = String(doc["ip"]);
       Serial.println(ip);
-      // Serial.println(doc["time"].as<long>());
-      // Serial.println(doc["data"][0].as<float>(), 6);
-      // Serial.println(doc["data"][1].as<float>(), 6);
-    }
+
+      // Cập nhật vào bộ nhớ
+      String s = getFile("caidat.json");
+      JsonDocument doc2;
+      DeserializationError error = deserializeJson(doc2, s);
+      if (error)
+      {
+        Serial.print(F("deserializeJson() failed: "));
+        Serial.println(error.f_str());
+        return;
+      }
+
+      doc2["ipf"] = ip;
+      String output;
+      serializeJson(doc2, output);
+      Serial.println(output);
+      writeData("/caidat.json", output);
+        }
     else
     {
       Serial.print("Error code: ");
