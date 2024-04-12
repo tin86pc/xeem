@@ -68,6 +68,8 @@ document.getElementById("tmh").addEventListener("click", () => {
     // (B1) UNLOCK FIRST
     screen.orientation.unlock();
 
+    
+
     // // (B2) THEN EXIT FULL SCREEN
     // if (document.fullscreenElement) {
     //   document.exitFullscreen();
@@ -98,6 +100,7 @@ document.getElementById("tmh").addEventListener("click", () => {
     if (screen.orientation.type != "landscape-primary") {
       screen.orientation.lock("landscape");
     }
+    
   }
 });
 

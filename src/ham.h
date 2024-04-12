@@ -103,9 +103,9 @@ void getJsonAPI()
       doc2["ipf"] = ip;
       String output;
       serializeJson(doc2, output);
-      Serial.println(output);
+      // Serial.println(output);
       writeData("/caidat.json", output);
-        }
+    }
     else
     {
       Serial.print("Error code: ");

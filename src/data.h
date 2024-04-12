@@ -44,11 +44,10 @@ bool saveFile(String filename, const uint8_t *content, uint16_t len)
     }
 }
 
-void writeData(String filename, String s)
-{
-    File file = LittleFS.open(filename, "w");
+void writeData(String filename,String s) {
+  File file = LittleFS.open(filename, "w");
     file.println(s);
-    file.close();
+   file.close();
     Serial.println("Write successful");
 }
 
