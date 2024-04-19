@@ -95,7 +95,7 @@ void startWifi()
   {
     Serial.print("Ket noi wifi: ");
     Serial.println(tenWifiBat);
-    Serial.print("Dia chi IP: ");
+    Serial.print("Dia chi IP: http://");
     Serial.println(WiFi.localIP());
   }
 
